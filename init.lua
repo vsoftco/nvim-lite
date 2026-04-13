@@ -6,6 +6,31 @@ if vim.loader then
 end
 
 -------------------------------------------------------------------------------
+-- Plugins (vim.pack)
+-------------------------------------------------------------------------------
+local plugins = {
+   -- Core
+   "https://github.com/saghen/blink.cmp", -- auto completion
+   "https://github.com/ibhagwan/fzf-lua", -- fuzzy finding, requires fzf
+   "https://github.com/rebelot/kanagawa.nvim", -- colour scheme
+   "https://github.com/nvim-lualine/lualine.nvim", -- status line
+   "https://github.com/christoomey/vim-tmux-navigator", -- seamless navigation between Neovim and tmux panes
+   "https://github.com/folke/which-key.nvim", -- keybinding helper (shows available mappings in a popup)
+
+   -- LSP
+   "https://github.com/mason-org/mason.nvim", -- installs formatters and linters, requires Node.js
+   "https://github.com/mason-org/mason-lspconfig.nvim", -- installs and enables language servers
+   "https://github.com/neovim/nvim-lspconfig", -- auto-configures language servers
+
+   -- Formatting and linting
+   "https://github.com/stevearc/conform.nvim", -- formatter
+   "https://github.com/mfussenegger/nvim-lint", -- linter
+
+   -- Enhances Neovim config development (Lua LSP, typings, etc.)
+   -- "https://github.com/folke/lazydev.nvim",
+}
+
+-------------------------------------------------------------------------------
 -- Options
 -------------------------------------------------------------------------------
 vim.opt.background = "dark"
@@ -94,30 +119,8 @@ vim.api.nvim_create_autocmd("PackChanged", {
    callback = install_pack_hooks,
 })
 
--------------------------------------------------------------------------------
--- Plugins (vim.pack)
--------------------------------------------------------------------------------
-vim.pack.add({
-   -- Core
-   "https://github.com/saghen/blink.cmp", -- auto completion
-   "https://github.com/ibhagwan/fzf-lua", -- fuzzy finding, requires fzf
-   "https://github.com/rebelot/kanagawa.nvim", -- colour scheme
-   "https://github.com/nvim-lualine/lualine.nvim", -- status line
-   "https://github.com/christoomey/vim-tmux-navigator", -- seamless navigation between Neovim and tmux panes
-   "https://github.com/folke/which-key.nvim", -- keybinding helper (shows available mappings in a popup)
-
-   -- LSP
-   "https://github.com/mason-org/mason.nvim", -- installs formatters and linters, requires Node.js
-   "https://github.com/mason-org/mason-lspconfig.nvim", -- installs and enables language servers
-   "https://github.com/neovim/nvim-lspconfig", -- auto-configures language servers
-
-   -- Formatting and linting
-   "https://github.com/stevearc/conform.nvim", -- formatter
-   "https://github.com/mfussenegger/nvim-lint", -- linter
-
-   -- Enhances Neovim config development (Lua LSP, typings, etc.)
-   -- "https://github.com/folke/lazydev.nvim",
-}, { confirm = false })
+-- Install plugins
+vim.pack.add(plugins, { confirm = false })
 
 -- Enable native Undotree
 vim.cmd("packadd nvim.undotree")
