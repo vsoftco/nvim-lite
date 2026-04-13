@@ -382,7 +382,7 @@ require("lint").linters_by_ft = {
    python = { "mypy" },
 }
 local nvim_lint_grp = vim.api.nvim_create_augroup("Nvim-lint", { clear = true })
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
    group = nvim_lint_grp,
    desc = "nvim-lint hooks",
    callback = function()
