@@ -213,12 +213,6 @@ fzf.setup({
 fzf.register_ui_select()
 vim.keymap.set(
    "n",
-   "<leader>ca",
-   "<cmd>FzfLua lsp_code_actions<CR>",
-   { desc = "LSP code actions", silent = true }
-)
-vim.keymap.set(
-   "n",
    "<leader>co",
    "<cmd>FzfLua colorschemes<CR>",
    { desc = "Color schemes", silent = true }
