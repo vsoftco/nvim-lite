@@ -87,8 +87,9 @@ end
 
 -- If hooks need to run on install, run this before `vim.pack.add()`
 -- To act on install from lockfile, run before very first `vim.pack.add()`
+local pack_grp = vim.api.nvim_create_augroup("Pack", { clear = true })
 vim.api.nvim_create_autocmd("PackChanged", {
-   group = vim.api.nvim_create_augroup("Pack", { clear = true }),
+   group = pack_grp,
    desc = "Install vim.pack hooks",
    callback = install_pack_hooks,
 })
@@ -380,8 +381,9 @@ require("lint").linters_by_ft = {
    cmake = { "cmakelint" },
    python = { "mypy" },
 }
+local nvim_lint_grp = vim.api.nvim_create_augroup("Nvim-lint", { clear = true })
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-   group = vim.api.nvim_create_augroup("Nvim-lint", { clear = true }),
+   group = nvim_lint_grp,
    desc = "nvim-lint hooks",
    callback = function()
       -- try_lint without arguments runs the linters defined in `linters_by_ft`
@@ -432,24 +434,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.keymap.set("n", "<ESC>", "<cmd>nohlsearch<CR>", { silent = true })
 vim.keymap.set(
    "n",
-   "gd",
-   vim.lsp.buf.definition,
-   { desc = "LSP go to definition", silent = true }
-)
-vim.keymap.set(
-   "n",
-   "gD",
-   vim.lsp.buf.declaration,
-   { desc = "LSP go to declaration", silent = true }
-)
-vim.keymap.set("n", "K", function()
-   vim.lsp.buf.hover({ border = "rounded" })
-end, {
-   desc = "LSP hover documentation",
-   silent = true,
-})
-vim.keymap.set(
-   "n",
    "<leader>e",
    "<cmd>Lexplore 25<CR>",
    { desc = "Netrw file explorer", silent = true }
@@ -459,6 +443,46 @@ vim.keymap.set("n", "<leader>u", function()
       command = "topleft 30vnew",
    })
 end, { desc = "Undotree toggle", silent = true })
+
+local lsp_grp = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
+vim.api.nvim_create_autocmd("LspAttach", {
+   group = lsp_grp,
+   desc = "LSP keymaps",
+   callback = function(ev)
+      vim.keymap.set(
+         "n",
+         "gd",
+         vim.lsp.buf.definition,
+         { desc = "LSP go to definition", silent = true }
+      )
+      vim.keymap.set(
+         "n",
+         "gD",
+         vim.lsp.buf.declaration,
+         { desc = "LSP go to declaration", silent = true }
+      )
+      vim.keymap.set("n", "<leader>ih", function()
+         local enabled = vim.lsp.inlay_hint.is_enabled()
+         local new = not enabled
+         vim.lsp.inlay_hint.enable(new)
+         vim.notify(
+            "Inlay hints (global): " .. (new and "enabled" or "disabled"),
+            vim.log.levels.INFO,
+            { title = "LSP" }
+         )
+      end, { desc = "Toggle inlay hints (global)" })
+      vim.keymap.set("n", "<leader>iH", function()
+         local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf })
+         local new = not enabled
+         vim.lsp.inlay_hint.enable(new, { bufnr = ev.buf })
+         vim.notify(
+            "Inlay hints (buffer): " .. (new and "enabled" or "disabled"),
+            vim.log.levels.INFO,
+            { title = "LSP" }
+         )
+      end, { buffer = ev.buf, desc = "Toggle inlay hints (buffer)" })
+   end,
+})
 
 -------------------------------------------------------------------------------
 -- UI
