@@ -54,6 +54,46 @@ vim.diagnostic.config({
 })
 
 -------------------------------------------------------------------------------
+-- vim.pack install hooks, https://neovim.io/doc/user/pack/#vim.pack-events
+-------------------------------------------------------------------------------
+---@param ev vim.api.keyset.create_autocmd.callback_args
+local function install_pack_hooks(ev)
+   -- Use available |event-data|
+   local name, kind = ev.data.spec.name, ev.data.kind
+   -- Run build script after plugin's code has changed
+   if name == "blink.cmp" and (kind == "install" or kind == "update") then
+      local plugin_path = ev.data.path
+      -- Check if cargo is available
+      if vim.fn.executable("cargo") == 1 then
+         vim.notify("[blink.cmp] Compiling Rust binary...", vim.log.levels.INFO)
+         -- Run the build command inside the plugin directory
+         local obj = vim.system(
+            { "cargo", "build", "--release" },
+            { cwd = plugin_path }
+         )
+            :wait()
+         -- Output build status
+         if obj.code == 0 then
+            vim.notify("[blink.cmp] Build complete.", vim.log.levels.INFO)
+         else
+            vim.notify(
+               "[blink.cmp] Build failed:\n" .. obj.stderr,
+               vim.log.levels.ERROR
+            )
+         end
+      end
+   end
+end
+
+-- If hooks need to run on install, run this before `vim.pack.add()`
+-- To act on install from lockfile, run before very first `vim.pack.add()`
+vim.api.nvim_create_autocmd("PackChanged", {
+   group = vim.api.nvim_create_augroup("Pack", { clear = true }),
+   desc = "Install vim.pack hooks",
+   callback = install_pack_hooks,
+})
+
+-------------------------------------------------------------------------------
 -- Plugins (vim.pack)
 -------------------------------------------------------------------------------
 vim.pack.add({
@@ -77,31 +117,6 @@ vim.pack.add({
 
 -- Enable native Undotree
 vim.cmd("packadd nvim.undotree")
-
--------------------------------------------------------------------------------
--- vim.pack install hooks, https://neovim.io/doc/user/pack/#vim.pack-events
--------------------------------------------------------------------------------
----@param ev vim.api.keyset.create_autocmd.callback_args
-local function install_pack_hooks(ev)
-   -- Use available |event-data|
-   local name, kind = ev.data.spec.name, ev.data.kind
-   -- Run build script after plugin's code has changed
-   if
-      name == "markdown-preview.nvim"
-      and (kind == "install" or kind == "update")
-   then
-      local app_path = ev.data.path .. "/app"
-      -- Append `:wait()` if you need synchronous execution
-      vim.system({ "npx", "-y", "yarn", "install" }, { cwd = app_path })
-   end
-end
--- If hooks need to run on install, run this before `vim.pack.add()`
--- To act on install from lockfile, run before very first `vim.pack.add()`
-vim.api.nvim_create_autocmd("PackChanged", {
-   group = vim.api.nvim_create_augroup("Pack", { clear = true }),
-   desc = "Install vim.pack hooks",
-   callback = install_pack_hooks,
-})
 
 -------------------------------------------------------------------------------
 -- vim.pack custom commands
@@ -170,7 +185,10 @@ require("blink.cmp").setup({
          },
       },
    },
-   fuzzy = { implementation = "lua" },
+   fuzzy = {
+      implementation = vim.fn.executable("cargo") == 1 and "prefer_rust"
+         or "lua",
+   },
    keymap = { ["<CR>"] = { "accept", "fallback" } },
    signature = {
       enabled = true,
