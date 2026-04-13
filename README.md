@@ -1,4 +1,4 @@
-# Modern Neovim starter kit (nvim-lite)
+# Modern Neovim starter kit
 
 A minimal Neovim configuration intended as a starting point for your own
 setup - simple, modern, and easy to extend, tailored for programming and
