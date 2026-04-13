@@ -113,6 +113,9 @@ vim.pack.add({
    -- Formatting and linting
    "https://github.com/stevearc/conform.nvim", -- formatter
    "https://github.com/mfussenegger/nvim-lint", -- linter
+
+   -- Enhances Neovim config development (Lua LSP, typings, etc.)
+   -- "https://github.com/folke/lazydev.nvim",
 }, { confirm = false })
 
 -- Enable native Undotree
