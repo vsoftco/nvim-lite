@@ -270,18 +270,10 @@ vim.keymap.set(
    { desc = "Diagnostics project", silent = true }
 )
 
--- kanagawa
+-- kanagawa.nvim
 require("kanagawa").setup({
    -- Remove the background of LineNr, {Sign,Fold}Column and friends
-   colors = {
-      theme = {
-         all = {
-            ui = {
-               bg_gutter = "none",
-            },
-         },
-      },
-   },
+   colors = { theme = { all = { ui = { bg_gutter = "none" } } } },
 })
 
 -- lualine.nvim
