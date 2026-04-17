@@ -213,6 +213,7 @@ vim.keymap.set("n", "<leader>bc", function()
    )
 end, {
    desc = "[B]link [c]ompletion (current buffer) toggle",
+   silent = true,
 })
 
 -- fzf-lua
@@ -476,7 +477,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.log.levels.INFO,
             { title = "LSP" }
          )
-      end, { desc = "Toggle inlay hints (global)" })
+      end, { desc = "Toggle inlay hints (global)", silent = true })
       vim.keymap.set("n", "<leader>iH", function()
          local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf })
          local new = not enabled
@@ -486,7 +487,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.log.levels.INFO,
             { title = "LSP" }
          )
-      end, { buffer = ev.buf, desc = "Toggle inlay hints (buffer)" })
+      end, {
+         desc = "Toggle inlay hints (buffer)",
+         silent = true,
+         buffer = ev.buf,
+      })
    end,
 })
 
