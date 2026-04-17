@@ -141,10 +141,11 @@ vim.api.nvim_create_user_command("PackClean", function()
    if #inactive_plugins > 0 then
       vim.pack.del(inactive_plugins)
       vim.notify(
-         "Removed inactive plugins: " .. table.concat(inactive_plugins, ", ")
+         "Removed inactive plugins: " .. table.concat(inactive_plugins, ", "),
+         vim.log.levels.INFO
       )
    else
-      vim.notify("No inactive plugins to remove")
+      vim.notify("No inactive plugins to remove", vim.log.levels.INFO)
    end
 end, {
    desc = "Remove inactive vim.pack plugins",
@@ -471,7 +472,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
          local new = not enabled
          vim.lsp.inlay_hint.enable(new)
          vim.notify(
-            "Inlay hints (global): " .. (new and "enabled" or "disabled"),
+            ("Inlay hints (global): %s"):format(new),
             vim.log.levels.INFO,
             { title = "LSP" }
          )
@@ -481,7 +482,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
          local new = not enabled
          vim.lsp.inlay_hint.enable(new, { bufnr = ev.buf })
          vim.notify(
-            "Inlay hints (buffer): " .. (new and "enabled" or "disabled"),
+            ("Inlay hints (buffer): %s"):format(new),
             vim.log.levels.INFO,
             { title = "LSP" }
          )
