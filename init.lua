@@ -203,6 +203,16 @@ require("blink.cmp").setup({
    },
    cmdline = { completion = { menu = { auto_show = true } } },
 })
+vim.keymap.set("n", "<leader>bc", function()
+   vim.b.completion = not (vim.b.completion ~= false)
+   vim.notify(
+      ("Blink completion (current buffer): %s"):format(vim.b.completion),
+      vim.log.levels.INFO,
+      { title = "core.keymaps.blink" }
+   )
+end, {
+   desc = "[B]link [c]ompletion (current buffer) toggle",
+})
 
 -- fzf-lua
 local fzf = require("fzf-lua")
