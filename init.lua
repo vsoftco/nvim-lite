@@ -207,12 +207,12 @@ require("blink.cmp").setup({
 vim.keymap.set("n", "<leader>bc", function()
    vim.b.completion = not (vim.b.completion ~= false)
    vim.notify(
-      ("Blink completion (current buffer): %s"):format(vim.b.completion),
+      ("Blink completion (buffer): %s"):format(vim.b.completion),
       vim.log.levels.INFO,
       { title = "core.keymaps.blink" }
    )
 end, {
-   desc = "[B]link [c]ompletion (current buffer) toggle",
+   desc = "Blink completion toggle (buffer)",
    silent = true,
 })
 
@@ -477,7 +477,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.log.levels.INFO,
             { title = "LSP" }
          )
-      end, { desc = "Toggle inlay hints (global)", silent = true })
+      end, { desc = "Inlay hints toggle (global)", silent = true })
       vim.keymap.set("n", "<leader>iH", function()
          local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf })
          local new = not enabled
@@ -488,7 +488,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             { title = "LSP" }
          )
       end, {
-         desc = "Toggle inlay hints (buffer)",
+         desc = "Inlay hints toggle (buffer)",
          silent = true,
          buffer = ev.buf,
       })
