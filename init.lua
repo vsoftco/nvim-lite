@@ -123,7 +123,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 vim.pack.add(plugins, { confirm = false })
 
 -- Enable native Undotree
-vim.cmd("packadd nvim.undotree")
+vim.cmd.packadd("nvim.undotree")
 
 -------------------------------------------------------------------------------
 -- vim.pack custom commands
