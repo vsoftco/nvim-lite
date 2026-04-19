@@ -26,7 +26,10 @@ local plugins = {
    "https://github.com/stevearc/conform.nvim", -- formatter
    "https://github.com/mfussenegger/nvim-lint", -- linter
 
-   -- Enhances Neovim config development (Lua LSP, typings, etc.)
+   -- Misc.
+   "https://github.com/windwp/nvim-autopairs", -- auto-closes and manages paired characters
+
+   -- Enhances Neovim config development (Lua LSP, Neovim types, etc.)
    -- "https://github.com/folke/lazydev.nvim",
 }
 
@@ -401,6 +404,12 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
       -- configuration
       -- require("lint").try_lint("cspell")
    end,
+})
+
+-- nvim-autopairs
+require("nvim-autopairs").setup({
+   fast_wrap = {},
+   disable_filetype = { "vim" },
 })
 
 -------------------------------------------------------------------------------
