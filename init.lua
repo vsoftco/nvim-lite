@@ -448,6 +448,52 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- Generic keymaps
 -------------------------------------------------------------------------------
 vim.keymap.set("n", "<ESC>", "<cmd>nohlsearch<CR>", { silent = true })
+
+vim.keymap.set(
+   { "n", "x" },
+   "<leader>d",
+   '"+d',
+   { desc = "Delete (cut) to system clipboard", silent = true }
+)
+vim.keymap.set(
+   { "n", "x" },
+   "<leader>p",
+   '"+p',
+   { desc = "Paste from system clipboard", silent = true }
+)
+vim.keymap.set(
+   { "n", "x" },
+   "<leader>y",
+   '"+y',
+   { desc = "Yank to system clipboard", silent = true }
+)
+vim.keymap.set(
+   { "n", "x" },
+   "<leader>_",
+   '"_d',
+   { desc = "Delete without yanking (black hole)", silent = true }
+)
+
+vim.keymap.set(
+   "v",
+   "<",
+   "<gv",
+   { desc = "Indent left (keep selection)", silent = true }
+)
+vim.keymap.set(
+   "v",
+   ">",
+   ">gv",
+   { desc = "Indent right (keep selection)", silent = true }
+)
+
+vim.keymap.set(
+   "x",
+   "p",
+   '"_dP',
+   { desc = "Paste without overwriting register", silent = true }
+)
+
 vim.keymap.set(
    "n",
    "<leader>e",
