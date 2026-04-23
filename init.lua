@@ -10,7 +10,7 @@ end
 -------------------------------------------------------------------------------
 local plugins = {
    -- Core
-   "https://github.com/saghen/blink.cmp", -- auto completion
+   { src = "https://github.com/saghen/blink.cmp", version = "v1" }, -- auto completion
    "https://github.com/ibhagwan/fzf-lua", -- fuzzy finding, requires fzf
    "https://github.com/rebelot/kanagawa.nvim", -- colour scheme
    "https://github.com/nvim-lualine/lualine.nvim", -- status line
