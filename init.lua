@@ -12,10 +12,12 @@ local plugins = {
    -- Core
    { src = "https://github.com/saghen/blink.cmp", version = "v1" }, -- auto completion
    "https://github.com/ibhagwan/fzf-lua", -- fuzzy finding, requires fzf
-   "https://github.com/rebelot/kanagawa.nvim", -- colour scheme
    "https://github.com/nvim-lualine/lualine.nvim", -- status line
    "https://github.com/christoomey/vim-tmux-navigator", -- seamless navigation between Neovim and tmux panes
-   "https://github.com/folke/which-key.nvim", -- keybinding helper (shows available mappings in a popup)
+   "https://github.com/folke/which-key.nvim", -- keymap helper (shows available mappings in a popup)
+
+   -- Colour scheme
+   "https://github.com/rebelot/kanagawa.nvim", -- colour scheme
 
    -- LSP
    "https://github.com/mason-org/mason.nvim", -- installs formatters and linters, requires Node.js
@@ -27,6 +29,7 @@ local plugins = {
    "https://github.com/mfussenegger/nvim-lint", -- linter
 
    -- Misc.
+   "https://github.com/lewis6991/gitsigns.nvim", -- inline git integration: hunks, blame, and gutter signs
    "https://github.com/windwp/nvim-autopairs", -- auto-closes and manages paired characters
 
    -- Enhances Neovim config development (Lua LSP, Neovim types, etc.)
@@ -82,44 +85,85 @@ vim.diagnostic.config({
 })
 
 -------------------------------------------------------------------------------
--- vim.pack install hooks, https://neovim.io/doc/user/pack/#vim.pack-events
+-- vim.pack install/update hooks
+-- https://neovim.io/doc/user/pack/#vim.pack-events
 -------------------------------------------------------------------------------
----@param ev vim.api.keyset.create_autocmd.callback_args
-local function install_pack_hooks(ev)
-   -- Use available |event-data|
-   local name, kind = ev.data.spec.name, ev.data.kind
-   -- Run build script after plugin's code has changed
-   if name == "blink.cmp" and (kind == "install" or kind == "update") then
-      local plugin_path = ev.data.path
+---@type table<string, fun(ev: vim.api.keyset.create_autocmd.callback_args)>
+local hooks = {
+   ["blink.cmp"] = function(ev)
       -- Check if cargo is available
-      if vim.fn.executable("cargo") == 1 then
-         vim.notify("[blink.cmp] Compiling Rust binary...", vim.log.levels.INFO)
-         -- Run the build command inside the plugin directory
-         local obj = vim.system(
-            { "cargo", "build", "--release" },
-            { cwd = plugin_path }
+      if vim.fn.executable("cargo") ~= 1 then
+         vim.notify(
+            "[blink.cmp] cargo not found -> Lua fallback (no native fuzzy matching)",
+            vim.log.levels.INFO,
+            { title = "blink.cmp" }
          )
-            :wait()
-         -- Output build status
-         if obj.code == 0 then
-            vim.notify("[blink.cmp] Build complete.", vim.log.levels.INFO)
-         else
-            vim.notify(
-               "[blink.cmp] Build failed:\n" .. obj.stderr,
-               vim.log.levels.ERROR
-            )
-         end
+         return
       end
+      vim.notify(
+         "[blink.cmp] Compiling Rust binary...",
+         vim.log.levels.INFO,
+         { title = "blink.cmp" }
+      )
+      -- Run the build command inside the plugin directory
+      vim.system(
+         { "cargo", "build", "--release" },
+         { cwd = ev.data.path },
+         function(obj)
+            -- Callback runs off the main thread → schedule back to UI
+            vim.schedule(function()
+               if obj.code == 0 then
+                  vim.notify(
+                     "[blink.cmp] Build complete",
+                     vim.log.levels.INFO,
+                     { title = "blink.cmp" }
+                  )
+               else
+                  vim.notify(
+                     ("[blink.cmp] Build failed:\n%s"):format(
+                        obj.stderr or "No error output"
+                     ),
+                     vim.log.levels.ERROR,
+                     { title = "blink.cmp" }
+                  )
+               end
+            end)
+         end
+      )
+   end,
+   -- Example: Add more hooks easily
+   -- ["fzf-lua"] = function(ev) ... end,
+}
+
+---@param ev vim.api.keyset.create_autocmd.callback_args
+local function run_pack_hooks(ev)
+   local data = ev.data
+   if not data then
+      return
+   end
+   -- Only care about install/update
+   local kind = data.kind
+   if kind ~= "install" and kind ~= "update" then
+      return
+   end
+   -- Safe access (no deep chaining)
+   local spec = data.spec
+   if not spec or not spec.name then
+      return
+   end
+   local hook = hooks[spec.name]
+   if hook then
+      hook(ev)
    end
 end
 
 -- If hooks need to run on install, run this before `vim.pack.add()`
 -- To act on install from lockfile, run before very first `vim.pack.add()`
-local pack_grp = vim.api.nvim_create_augroup("Pack", { clear = true })
+local pack_grp = vim.api.nvim_create_augroup("PackHooks", { clear = true })
 vim.api.nvim_create_autocmd("PackChanged", {
    group = pack_grp,
-   desc = "Install vim.pack hooks",
-   callback = install_pack_hooks,
+   desc = "Execute plugin-specific post-install/update hooks",
+   callback = run_pack_hooks,
 })
 
 -- Install plugins
@@ -144,11 +188,18 @@ vim.api.nvim_create_user_command("PackClean", function()
    if #inactive_plugins > 0 then
       vim.pack.del(inactive_plugins)
       vim.notify(
-         "Removed inactive plugins: " .. table.concat(inactive_plugins, ", "),
-         vim.log.levels.INFO
+         ("Removed inactive plugins: %s"):format(
+            table.concat(inactive_plugins, ", ")
+         ),
+         vim.log.levels.INFO,
+         { title = "PackClean" }
       )
    else
-      vim.notify("No inactive plugins to remove", vim.log.levels.INFO)
+      vim.notify(
+         "No inactive plugins to remove",
+         vim.log.levels.INFO,
+         { title = "PackClean" }
+      )
    end
 end, {
    desc = "Remove inactive vim.pack plugins",
@@ -167,7 +218,7 @@ end, {
 })
 
 -------------------------------------------------------------------------------
--- Plugin configurations
+-- Plugin configurations (in alphabetical order)
 -------------------------------------------------------------------------------
 -- blink.cmp
 require("blink.cmp").setup({
@@ -212,7 +263,7 @@ vim.keymap.set("n", "<leader>bc", function()
    vim.notify(
       ("Blink completion (buffer): %s"):format(vim.b.completion),
       vim.log.levels.INFO,
-      { title = "core.keymaps.blink" }
+      { title = "Blink completion toggle (buffer)" }
    )
 end, {
    desc = "Blink completion toggle (buffer)",
@@ -530,7 +581,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
          vim.notify(
             ("Inlay hints (global): %s"):format(new),
             vim.log.levels.INFO,
-            { title = "LSP" }
+            { title = "Inlay hints toggle (global)" }
          )
       end, { desc = "Inlay hints toggle (global)", silent = true })
       vim.keymap.set("n", "<leader>iH", function()
@@ -540,7 +591,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
          vim.notify(
             ("Inlay hints (buffer): %s"):format(new),
             vim.log.levels.INFO,
-            { title = "LSP" }
+            { title = "Inlay hints toggle (buffer)" }
          )
       end, {
          desc = "Inlay hints toggle (buffer)",
