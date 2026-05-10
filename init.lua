@@ -71,6 +71,11 @@ vim.opt.undofile = true
 vim.opt.virtualedit = "block"
 vim.opt.winborder = "rounded"
 
+if vim.fn.executable("rg") == 1 then
+   vim.opt.grepprg = "rg --vimgrep --smart-case --hidden"
+   vim.opt.grepformat = "%f:%l:%c:%m"
+end
+
 vim.opt_local.foldmethod = "expr"
 vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
@@ -493,6 +498,23 @@ vim.api.nvim_create_autocmd("TextYankPost", {
    callback = function()
       vim.highlight.on_yank({ timeout = 200 })
    end,
+})
+
+-- Open the quickfix window after quickfix commands when results are available
+vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+   group = quickfix_grp,
+   pattern = { "grep", "make", "vimgrep", "helpgrep" },
+   desc = "Open quickfix window when results are available",
+   command = "cwindow",
+})
+
+-- Open the location window after location-list commands when results are
+-- available
+vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+   group = quickfix_grp,
+   pattern = { "lgrep", "lmake", "lvimgrep", "lhelpgrep" },
+   desc = "Open location window when results are available",
+   command = "lwindow",
 })
 
 -------------------------------------------------------------------------------
