@@ -468,6 +468,33 @@ require("nvim-autopairs").setup({
    disable_filetype = { "vim" },
 })
 
+-- vim-tmux-navigator
+vim.g.tmux_navigator_no_mappings = 1
+vim.keymap.set(
+   { "n", "t" },
+   "<C-h>",
+   "<cmd>TmuxNavigateLeft<CR>",
+   { desc = "Window left", silent = true }
+)
+vim.keymap.set(
+   { "n", "t" },
+   "<C-l>",
+   "<cmd>TmuxNavigateRight<CR>",
+   { desc = "Window right", silent = true }
+)
+vim.keymap.set(
+   { "n", "t" },
+   "<C-j>",
+   "<cmd>TmuxNavigateDown<CR>",
+   { desc = "Window down", silent = true }
+)
+vim.keymap.set(
+   { "n", "t" },
+   "<C-k>",
+   "<cmd>TmuxNavigateUp<CR>",
+   { desc = "Window up", silent = true }
+)
+
 -------------------------------------------------------------------------------
 -- Auto commands
 -------------------------------------------------------------------------------
@@ -565,6 +592,13 @@ vim.keymap.set(
    "p",
    '"_dP',
    { desc = "Paste without overwriting register", silent = true }
+)
+
+vim.keymap.set(
+   { "n", "t" },
+   "<Esc><Esc>",
+   "<C-\\><C-n>",
+   { desc = "Exit Terminal mode and return to Normal mode", silent = true }
 )
 
 vim.keymap.set(
