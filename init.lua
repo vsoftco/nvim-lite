@@ -345,6 +345,12 @@ vim.keymap.set(
 require("kanagawa").setup({
    -- Remove the background of LineNr, {Sign,Fold}Column and friends
    colors = { theme = { all = { ui = { bg_gutter = "none" } } } },
+   -- Make end-of-buffer `~` markers visible
+   overrides = function(colors)
+      return {
+         EndOfBuffer = { fg = colors.theme.ui.nontext },
+      }
+   end,
 })
 
 -- lualine.nvim
