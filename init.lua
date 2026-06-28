@@ -30,6 +30,7 @@ local plugins = {
 
    -- Misc.
    "https://github.com/lewis6991/gitsigns.nvim", -- inline git integration: hunks, blame, and gutter signs
+   "https://github.com/hedyhli/outline.nvim", -- symbol outline (code structure / LSP-based)
    "https://github.com/windwp/nvim-autopairs", -- auto-closes and manages paired characters
 
    -- Enhances Neovim config development (Lua LSP, Neovim types, etc.)
@@ -275,6 +276,28 @@ end, {
    silent = true,
 })
 
+-- conform.nvim
+require("conform").setup({
+   formatters_by_ft = {
+      cmake = { "cmakelang" },
+      go = { "golines", "gofumpt", "goimports" },
+      javascript = { "prettier" },
+      json = { "prettier" },
+      lua = { "stylua" },
+      markdown = { "prettier" },
+      python = { "black" },
+      sh = { "shfmt" },
+      typescript = { "prettier" },
+   },
+   format_on_save = {
+      timeout_ms = 500,
+      lsp_fallback = true, -- use LSP if no formatter
+   },
+})
+vim.keymap.set("n", "<leader>fm", function()
+   require("conform").format()
+end, { desc = "Format buffer (conform.nvim)", silent = true })
+
 -- fzf-lua
 local fzf = require("fzf-lua")
 fzf.setup({
@@ -425,28 +448,6 @@ require("mason-lspconfig").setup({
 })
 vim.lsp.enable("julials")
 
--- conform.nvim
-require("conform").setup({
-   formatters_by_ft = {
-      cmake = { "cmakelang" },
-      go = { "golines", "gofumpt", "goimports" },
-      javascript = { "prettier" },
-      json = { "prettier" },
-      lua = { "stylua" },
-      markdown = { "prettier" },
-      python = { "black" },
-      sh = { "shfmt" },
-      typescript = { "prettier" },
-   },
-   format_on_save = {
-      timeout_ms = 500,
-      lsp_fallback = true, -- use LSP if no formatter
-   },
-})
-vim.keymap.set("n", "<leader>fm", function()
-   require("conform").format()
-end, { desc = "Format buffer (conform.nvim)", silent = true })
-
 -- nvim-lint
 require("lint").linters_by_ft = {
    bash = { "shellcheck" },
@@ -473,6 +474,17 @@ require("nvim-autopairs").setup({
    fast_wrap = {},
    disable_filetype = { "vim" },
 })
+
+-- outline.nvim
+require("outline").setup({
+   keymaps = {
+      -- Do not close with <Esc>; press q instead
+      close = "q",
+   },
+})
+vim.keymap.set("n", "<leader>so", function()
+   vim.cmd.Outline({ bang = true })
+end, { desc = "Outline toggle", silent = true })
 
 -- vim-tmux-navigator
 vim.g.tmux_navigator_no_mappings = 1
