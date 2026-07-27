@@ -353,6 +353,12 @@ vim.keymap.set(
 )
 vim.keymap.set(
    "n",
+   "<leader>fy",
+   "<cmd>FzfLua lsp_document_symbols<CR>",
+   { desc = "LSP symbols", silent = true }
+)
+vim.keymap.set(
+   "n",
    "<leader>xX",
    "<cmd>FzfLua diagnostics_document<CR>",
    { desc = "Diagnostics document", silent = true }
