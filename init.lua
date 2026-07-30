@@ -434,13 +434,13 @@ vim.keymap.set(
    "n",
    "<leader>fx",
    "<cmd>FzfLua diagnostics_workspace<CR>",
-   { desc = "Diagnostics project", silent = true }
+   { desc = "FzfLua diagnostics project", silent = true }
 )
 vim.keymap.set(
    "n",
    "<leader>fX",
    "<cmd>FzfLua diagnostics_document<CR>",
-   { desc = "Diagnostics document", silent = true }
+   { desc = "FzfLua diagnostics document", silent = true }
 )
 vim.keymap.set("n", "<leader>fy", function()
    require("fzf-lua").lsp_document_symbols()
