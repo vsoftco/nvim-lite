@@ -309,65 +309,153 @@ fzf.setup({
    },
 })
 fzf.register_ui_select()
+--- Returns a list of file paths for all currently listed and readable open buffers
+---@return string[] A table containing the file paths of valid open buffers
+local function get_buffer_paths()
+   local search_paths = {}
+   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      -- Check if the buffer is listed (open in bufferline/manager)
+      if vim.fn.buflisted(bufnr) == 1 then
+         local name = vim.api.nvim_buf_get_name(bufnr)
+         -- Ensure it has a name and the file actually exists on disk
+         if name ~= "" and vim.fn.filereadable(name) == 1 then
+            table.insert(search_paths, name)
+         end
+      end
+   end
+   return search_paths
+end
 vim.keymap.set(
    "n",
-   "<leader>co",
-   "<cmd>FzfLua colorschemes<CR>",
-   { desc = "Color schemes", silent = true }
+   "<leader>fa",
+   "<cmd> FzfLua files follow=true no_ignore=true hidden=true <CR>",
+   { desc = "FzfLua all files" }
 )
 vim.keymap.set(
    "n",
    "<leader>fb",
-   "<cmd>FzfLua buffers<CR>",
-   { desc = "Find buffers", silent = true }
+   "<cmd> FzfLua buffers <CR>",
+   { desc = "FzfLua buffers" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fc",
+   "<cmd> FzfLua git_commits <CR>",
+   { desc = "FzfLua Git commits" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fC",
+   "<cmd> FzfLua git_bcommits <CR>",
+   { desc = "FzfLua Git buffer commits" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fe",
+   "<cmd> FzfLua oldfiles <CR>",
+   { desc = "FzfLua recent files" }
 )
 vim.keymap.set(
    "n",
    "<leader>ff",
-   "<cmd>FzfLua files<CR>",
-   { desc = "Find files", silent = true }
+   "<cmd> FzfLua files <CR>",
+   { desc = "FzfLua files" }
 )
 vim.keymap.set(
    "n",
    "<leader>fg",
-   "<cmd>FzfLua grep_project<CR>",
-   { desc = "Grep project", silent = true }
+   "<cmd> FzfLua live_grep <CR>",
+   { desc = "FzfLua live grep" }
+)
+vim.keymap.set("n", "<leader>fG", function()
+   local search_paths = get_buffer_paths()
+   if #search_paths == 0 then
+      vim.notify("No open file buffers found to live grep", vim.log.levels.WARN)
+      return
+   end
+   require("fzf-lua").live_grep({
+      search_paths = search_paths,
+   })
+end, { desc = "FzfLua live grep open buffers" })
+vim.keymap.set(
+   "n",
+   "<leader>fh",
+   "<cmd> FzfLua helptags <CR>",
+   { desc = "FzfLua help tags" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fi",
+   "<cmd> FzfLua git_files <CR>",
+   { desc = "FzfLua Git files" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fn",
+   "<cmd> lua require('fzf-lua').files({ cwd = vim.fn.stdpath('config') }) <CR>",
+   { desc = "FzfLua nvim config files" }
 )
 vim.keymap.set(
    "n",
    "<leader>fo",
    "<cmd>FzfLua oldfiles<CR>",
-   { desc = "File history", silent = true }
-)
-vim.keymap.set(
-   "n",
-   "<leader>fi",
-   "<cmd>FzfLua git_files<CR>",
-   { desc = "Find git files", silent = true }
+   { desc = "FzfLua file history", silent = true }
 )
 vim.keymap.set(
    "n",
    "<leader>fr",
-   "<cmd>FzfLua lsp_references<CR>",
-   { desc = "LSP references", silent = true }
+   "<cmd> FzfLua lsp_references <CR>",
+   { desc = "FzfLua LSP references" }
 )
 vim.keymap.set(
    "n",
-   "<leader>fy",
-   "<cmd>FzfLua lsp_document_symbols<CR>",
-   { desc = "LSP symbols", silent = true }
+   "<leader>fs",
+   "<cmd> FzfLua git_status <CR>",
+   { desc = "FzfLua Git status" }
 )
 vim.keymap.set(
    "n",
-   "<leader>xX",
+   "<leader>fS",
+   "<cmd> FzfLua grep_cword <CR>",
+   { desc = "FzfLua grep string" }
+)
+vim.keymap.set("n", "<leader>fT", function()
+   local search_paths = get_buffer_paths()
+   if #search_paths == 0 then
+      vim.notify("No open file buffers found to grep", vim.log.levels.WARN)
+      return
+   end
+   require("fzf-lua").grep({
+      search = vim.fn.expand("<cword>"),
+      search_paths = search_paths,
+   })
+end, { desc = "FzfLua grep string open buffers" })
+vim.keymap.set(
+   "n",
+   "<leader>fx",
+   "<cmd>FzfLua diagnostics_workspace<CR>",
+   { desc = "Diagnostics project", silent = true }
+)
+vim.keymap.set(
+   "n",
+   "<leader>fX",
    "<cmd>FzfLua diagnostics_document<CR>",
    { desc = "Diagnostics document", silent = true }
 )
+vim.keymap.set("n", "<leader>fy", function()
+   require("fzf-lua").lsp_document_symbols()
+end, { desc = "FzfLua LSP document symbols" })
 vim.keymap.set(
    "n",
-   "<leader>xx",
-   "<cmd>FzfLua diagnostics_workspace<CR>",
-   { desc = "Diagnostics project", silent = true }
+   "<leader>fz",
+   "<cmd> FzfLua blines <CR>",
+   { desc = "FzfLua fuzzy find current buffer" }
+)
+vim.keymap.set(
+   "n",
+   "<leader>f'",
+   "<cmd> FzfLua marks <CR>",
+   { desc = "FzfLua marks" }
 )
 
 -- kanagawa.nvim
