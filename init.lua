@@ -596,7 +596,7 @@ vim.keymap.set(
 )
 vim.keymap.set(
    { "t" },
-   "<C-M-l>",
+   "<C-w>l",
    "<cmd>TmuxNavigateRight<CR>",
    { desc = "Window right", silent = true }
 )
