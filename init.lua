@@ -589,13 +589,7 @@ vim.keymap.set(
    { desc = "Window left", silent = true }
 )
 vim.keymap.set(
-   { "n" },
-   "<C-l>",
-   "<cmd>TmuxNavigateRight<CR>",
-   { desc = "Window right", silent = true }
-)
-vim.keymap.set(
-   { "t" },
+   { "n", "t" },
    "<C-w>l",
    "<cmd>TmuxNavigateRight<CR>",
    { desc = "Window right", silent = true }
