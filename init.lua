@@ -43,6 +43,7 @@ local plugins = {
 vim.opt.background = "dark"
 vim.opt.cursorline = true
 vim.opt.expandtab = true
+vim.opt.exrc = true
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldnestmax = 10
