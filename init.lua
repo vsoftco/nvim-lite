@@ -609,6 +609,12 @@ vim.keymap.set(
    "<cmd>TmuxNavigateUp<CR>",
    { desc = "Window up", silent = true }
 )
+vim.keymap.set(
+   { "n", "t" },
+   "<C-\\>",
+   "<cmd>TmuxNavigatePrevious<CR>",
+   { desc = "Window previous", silent = true }
+)
 
 -------------------------------------------------------------------------------
 -- Auto commands
